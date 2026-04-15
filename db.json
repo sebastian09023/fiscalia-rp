@@ -1,0 +1,38 @@
+{
+  "casos": [
+    {
+      "num": "232",
+      "titulo": "232",
+      "tipo": "Homicidio",
+      "estado": "Abierto",
+      "prioridad": "Normal",
+      "fiscal": "232",
+      "fecha": "0232-02-23",
+      "desc": ""
+    },
+    {
+      "num": "prueba",
+      "titulo": "prueba",
+      "tipo": "Homicidio",
+      "estado": "Abierto",
+      "prioridad": "Normal",
+      "fiscal": "sebas 5003",
+      "fecha": "2026-04-15",
+      "desc": "prueba"
+    },
+    {
+      "num": "424",
+      "titulo": "244",
+      "tipo": "Homicidio",
+      "estado": "Abierto",
+      "prioridad": "Normal",
+      "fiscal": "4242",
+      "fecha": "4242-02-04",
+      "desc": "42"
+    }
+  ],
+  "investigaciones": [],
+  "personas": [],
+  "documentos": [],
+  "logs": []
+}

@@ -1,0 +1,837 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); background: var(--color-background-tertiary); }
+
+  .header {
+    background: linear-gradient(135deg, #0C447C 0%, #042C53 100%);
+    color: white;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-inner {
+    display: flex; align-items: center; gap: 20px;
+    padding: 24px 28px 18px;
+    position: relative; z-index: 1;
+  }
+  .escudo {
+    width: 64px; height: 64px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .escudo svg { width: 36px; height: 36px; }
+  .header-text h1 { font-size: 22px; font-weight: 500; color: white; }
+  .header-text p { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+  .header-badges { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .hbadge {
+    font-size: 11px; padding: 3px 10px;
+    background: rgba(255,255,255,0.15);
+    border: 0.5px solid rgba(255,255,255,0.3);
+    border-radius: 20px; color: rgba(255,255,255,0.9);
+  }
+
+  .nav {
+    background: var(--color-background-primary);
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+    display: flex; gap: 0; overflow-x: auto;
+    padding: 0 20px;
+  }
+  .nav-btn {
+    padding: 14px 18px;
+    font-size: 13px; font-weight: 400;
+    color: var(--color-text-secondary);
+    background: none; border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { color: var(--color-text-primary); }
+  .nav-btn.active {
+    color: #185FA5;
+    border-bottom-color: #185FA5;
+    font-weight: 500;
+  }
+
+  .content { padding: 20px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-num { font-size: 26px; font-weight: 500; margin-top: 4px; color: var(--color-text-primary); }
+  .stat-num.blue { color: #185FA5; }
+  .stat-num.amber { color: #BA7517; }
+  .stat-num.red { color: #A32D2D; }
+  .stat-num.green { color: #3B6D11; }
+
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+  }
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .card-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .card-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 3px; }
+
+  .badge {
+    font-size: 11px; padding: 3px 10px;
+    border-radius: 20px; font-weight: 500; white-space: nowrap; flex-shrink: 0;
+  }
+  .badge-red { background: #FCEBEB; color: #A32D2D; }
+  .badge-amber { background: #FAEEDA; color: #854F0B; }
+  .badge-green { background: #EAF3DE; color: #3B6D11; }
+  .badge-blue { background: #E6F1FB; color: #185FA5; }
+  .badge-gray { background: #F1EFE8; color: #5F5E5A; }
+  .badge-purple { background: #EEEDFE; color: #534AB7; }
+
+  .meta-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+  .meta { font-size: 12px; color: var(--color-text-secondary); }
+  .meta span { color: var(--color-text-primary); font-weight: 500; }
+
+  .action-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    background: #185FA5; color: white; border: none;
+    padding: 8px 16px; border-radius: var(--border-radius-md);
+    font-size: 13px; cursor: pointer; font-weight: 500;
+  }
+  .btn-primary:hover { background: #0C447C; }
+  .btn-secondary {
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    border: 0.5px solid var(--color-border-secondary);
+    padding: 8px 14px; border-radius: var(--border-radius-md);
+    font-size: 13px; cursor: pointer;
+  }
+  .btn-secondary:hover { background: var(--color-background-secondary); }
+  .btn-danger {
+    background: #FCEBEB; color: #A32D2D; border: 0.5px solid #F7C1C1;
+    padding: 6px 12px; border-radius: var(--border-radius-md);
+    font-size: 12px; cursor: pointer;
+  }
+
+  .search-input {
+    flex: 1; min-width: 160px; max-width: 260px;
+    padding: 8px 12px; font-size: 13px;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+  }
+  .filter-select {
+    padding: 8px 12px; font-size: 13px;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+  }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 100;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    border: 0.5px solid var(--color-border-secondary);
+    padding: 24px; width: 100%; max-width: 520px;
+    max-height: 85vh; overflow-y: auto;
+  }
+  .modal-title { font-size: 17px; font-weight: 500; margin-bottom: 16px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 5px; display: block; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 9px 12px; font-size: 14px;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary); font-family: var(--font-sans);
+  }
+  .form-textarea { min-height: 80px; resize: vertical; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+  .btn-cancel {
+    padding: 9px 18px; font-size: 13px;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    background: none; color: var(--color-text-secondary); cursor: pointer;
+  }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--color-text-secondary); font-size: 14px; }
+  .empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .detail-item { }
+  .detail-key { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.4px; }
+  .detail-val { font-size: 14px; color: var(--color-text-primary); margin-top: 2px; font-weight: 500; }
+
+  .progress-bar-wrap { background: var(--color-background-secondary); border-radius: 4px; height: 6px; margin-top: 10px; }
+  .progress-bar { height: 6px; border-radius: 4px; background: #185FA5; }
+
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin: 2px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); }
+
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 14px 0; }
+
+  .log-entry { padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .log-entry:last-child { border-bottom: none; }
+  .log-time { font-size: 11px; color: var(--color-text-secondary); }
+  .log-text { font-size: 13px; color: var(--color-text-primary); margin-top: 2px; }
+
+  .expand-btn { font-size: 12px; color: #185FA5; background: none; border: none; cursor: pointer; padding: 0; margin-top: 8px; }
+:root {
+  --font-sans: 'Segoe UI', sans-serif;
+
+  --color-background-primary: #0f172a;      /* fondo principal */
+  --color-background-secondary: #1e293b;    /* tarjetas */
+  --color-background-tertiary: #020617;     /* fondo general */
+
+  --color-text-primary: #e2e8f0;            /* texto blanco */
+  --color-text-secondary: #94a3b8;          /* texto gris */
+
+  --color-border-primary: #334155;
+  --color-border-secondary: #1e293b;
+  --color-border-tertiary: #334155;
+
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+</style>
+
+<h2 style="color:white; padding:10px;">
+Sistema de gestión de la Fiscalía - La Región RP
+</h2>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="escudo">
+      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 3L4 9v10c0 8 6.2 14.8 14 16.8C25.8 33.8 32 27 32 19V9L18 3z" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+        <path d="M12 18l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Fiscalía General</h1>
+      <p>La Región RP — Sistema de Gestión Judicial</p>
+      <div class="header-badges">
+        <span class="hbadge">Sistema Activo</span>
+        <span class="hbadge" id="hbadge-date"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showSection('dashboard')">Inicio</button>
+  <button class="nav-btn" onclick="showSection('casos')">Casos</button>
+  <button class="nav-btn" onclick="showSection('investigaciones')">Investigaciones</button>
+  <button class="nav-btn" onclick="showSection('personas')">Personas</button>
+  <button class="nav-btn" onclick="showSection('documentos')">Documentos</button>
+  <button class="nav-btn" onclick="showSection('actividad')">Actividad</button>
+</div>
+
+<div class="content">
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="sec-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Casos totales</div>
+        <div class="stat-num blue" id="stat-total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">En proceso</div>
+        <div class="stat-num amber" id="stat-proceso">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Cerrados</div>
+        <div class="stat-num green" id="stat-cerrados">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Urgentes</div>
+        <div class="stat-num red" id="stat-urgentes">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Casos recientes</div><button class="btn-primary" onclick="showSection('casos')">Ver todos</button></div>
+      <div id="dashboard-casos"></div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="card-title" style="margin-bottom:12px;">Actividad reciente</div>
+      <div id="dashboard-logs"></div>
+    </div>
+  </div>
+
+  <!-- CASOS -->
+  <div class="section" id="sec-casos">
+    <div class="action-bar">
+      <button class="btn-primary" onclick="openModal('modal-caso')">+ Nuevo caso</button>
+      <input class="search-input" type="text" placeholder="Buscar caso..." oninput="renderCasos()" id="search-casos">
+      <select class="filter-select" onchange="renderCasos()" id="filter-estado">
+        <option value="">Todos los estados</option>
+        <option value="Abierto">Abierto</option>
+        <option value="En proceso">En proceso</option>
+        <option value="Cerrado">Cerrado</option>
+        <option value="Archivado">Archivado</option>
+      </select>
+      <select class="filter-select" onchange="renderCasos()" id="filter-tipo">
+        <option value="">Todos los tipos</option>
+        <option value="Homicidio">Homicidio</option>
+        <option value="Robo">Robo</option>
+        <option value="Narcotráfico">Narcotráfico</option>
+        <option value="Corrupción">Corrupción</option>
+        <option value="Fraude">Fraude</option>
+        <option value="Extorsión">Extorsión</option>
+        <option value="Secuestro">Secuestro</option>
+        <option value="Otro">Otro</option>
+      </select>
+    </div>
+    <div id="list-casos"></div>
+  </div>
+
+  <!-- INVESTIGACIONES -->
+  <div class="section" id="sec-investigaciones">
+    <div class="action-bar">
+      <button class="btn-primary" onclick="openModal('modal-inv')">+ Nueva investigación</button>
+      <input class="search-input" type="text" placeholder="Buscar investigación..." oninput="renderInvestigaciones()" id="search-inv">
+      <select class="filter-select" onchange="renderInvestigaciones()" id="filter-inv-estado">
+        <option value="">Todos</option>
+        <option value="Activa">Activa</option>
+        <option value="Suspendida">Suspendida</option>
+        <option value="Concluida">Concluida</option>
+      </select>
+    </div>
+    <div id="list-investigaciones"></div>
+  </div>
+
+  <!-- PERSONAS -->
+  <div class="section" id="sec-personas">
+    <div class="action-bar">
+      <button class="btn-primary" onclick="openModal('modal-persona')">+ Registrar persona</button>
+      <input class="search-input" type="text" placeholder="Buscar por nombre o ID..." oninput="renderPersonas()" id="search-personas">
+      <select class="filter-select" onchange="renderPersonas()" id="filter-rol">
+        <option value="">Todos los roles</option>
+        <option value="Sospechoso">Sospechoso</option>
+        <option value="Imputado">Imputado</option>
+        <option value="Testigo">Testigo</option>
+        <option value="Víctima">Víctima</option>
+      </select>
+    </div>
+    <div id="list-personas"></div>
+  </div>
+
+  <!-- DOCUMENTOS -->
+  <div class="section" id="sec-documentos">
+    <div class="action-bar">
+      <button class="btn-primary" onclick="openModal('modal-doc')">+ Nuevo documento</button>
+      <input class="search-input" type="text" placeholder="Buscar documento..." oninput="renderDocumentos()" id="search-docs">
+    </div>
+    <div id="list-documentos"></div>
+  </div>
+
+  <!-- ACTIVIDAD -->
+  <div class="section" id="sec-actividad">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">Registro de actividad</div>
+      <div id="full-logs"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL CASO -->
+<div class="modal-overlay" id="modal-caso">
+  <div class="modal">
+    <div class="modal-title">Nuevo caso</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">N° de caso</label>
+        <input class="form-input" id="c-num" placeholder="Ej: FIS-2024-001">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de delito</label>
+        <select class="form-select" id="c-tipo">
+          <option>Homicidio</option><option>Robo</option><option>Narcotráfico</option>
+          <option>Corrupción</option><option>Fraude</option><option>Extorsión</option>
+          <option>Secuestro</option><option>Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Título del caso</label>
+      <input class="form-input" id="c-titulo" placeholder="Descripción breve del caso">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Estado</label>
+        <select class="form-select" id="c-estado">
+          <option>Abierto</option><option>En proceso</option><option>Cerrado</option><option>Archivado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prioridad</label>
+        <select class="form-select" id="c-prioridad">
+          <option>Normal</option><option>Alta</option><option>Urgente</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Fiscal asignado</label>
+        <input class="form-input" id="c-fiscal" placeholder="Nombre del fiscal">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha de apertura</label>
+        <input class="form-input" type="date" id="c-fecha">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descripción</label>
+      <textarea class="form-textarea" id="c-desc" placeholder="Detalle los hechos del caso..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-caso')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarCaso()">Guardar caso</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INVESTIGACION -->
+<div class="modal-overlay" id="modal-inv">
+  <div class="modal">
+    <div class="modal-title">Nueva investigación</div>
+    <div class="form-group">
+      <label class="form-label">Nombre de la investigación</label>
+      <input class="form-input" id="i-nombre" placeholder="Ej: Operación Escudo">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Caso relacionado (N°)</label>
+        <input class="form-input" id="i-caso" placeholder="FIS-2024-001">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Estado</label>
+        <select class="form-select" id="i-estado">
+          <option>Activa</option><option>Suspendida</option><option>Concluida</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Investigador líder</label>
+      <input class="form-input" id="i-lider" placeholder="Nombre del investigador">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Objetivo</label>
+      <textarea class="form-textarea" id="i-objetivo" placeholder="Objetivo de la investigación..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Evidencias</label>
+      <input class="form-input" id="i-evidencias" placeholder="Ej: Video CCTV, Testimonio testigo, Registro llamadas">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-inv')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarInvestigacion()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PERSONA -->
+<div class="modal-overlay" id="modal-persona">
+  <div class="modal">
+    <div class="modal-title">Registrar persona</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nombre completo</label>
+        <input class="form-input" id="p-nombre" placeholder="Nombre y apellidos">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ID ciudadano</label>
+        <input class="form-input" id="p-id" placeholder="ID en el servidor">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Rol</label>
+        <select class="form-select" id="p-rol">
+          <option>Sospechoso</option><option>Imputado</option><option>Testigo</option><option>Víctima</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Caso relacionado</label>
+        <input class="form-input" id="p-caso" placeholder="N° de caso">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Antecedentes / Notas</label>
+      <textarea class="form-textarea" id="p-notas" placeholder="Antecedentes, notas relevantes..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-persona')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarPersona()">Registrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DOCUMENTO -->
+<div class="modal-overlay" id="modal-doc">
+  <div class="modal">
+    <div class="modal-title">Nuevo documento</div>
+    <div class="form-group">
+      <label class="form-label">Título del documento</label>
+      <input class="form-input" id="d-titulo" placeholder="Nombre del documento">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="form-select" id="d-tipo">
+          <option>Orden de arresto</option><option>Citación</option><option>Acta de acusación</option>
+          <option>Informe pericial</option><option>Declaración</option><option>Sentencia</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Caso relacionado</label>
+        <input class="form-input" id="d-caso" placeholder="N° de caso">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contenido / Descripción</label>
+      <textarea class="form-textarea" id="d-contenido" placeholder="Contenido o descripción del documento..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emitido por</label>
+      <input class="form-input" id="d-emisor" placeholder="Fiscal o autoridad emisora">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-doc')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarDocumento()">Guardar</button>
+    </div>
+  </div>
+</div>
+<div style="
+position: fixed;
+bottom: 10px;
+right: 15px;
+font-size: 11px;
+color: rgba(255,255,255,0.4);
+">
+  Sistema Fiscalía RP • Sebas Rodríguez
+</div>
+
+<script>
+let DB = {};
+
+async function cargarDB(){
+  let res = await fetch('/data');
+  DB = await res.json();
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function now() {
+  const d = new Date();
+  return d.toLocaleDateString('es-CO', {day:'2-digit',month:'short',year:'numeric'}) + ' ' + d.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+}
+function addLog(msg) {
+  DB.logs.unshift({ time: now(), msg });
+  if(DB.logs.length > 50) DB.logs.pop();
+}
+function estadoBadge(e) {
+  const m = {
+    'Abierto':'badge-blue','En proceso':'badge-amber','Cerrado':'badge-green','Archivado':'badge-gray',
+    'Activa':'badge-blue','Suspendida':'badge-amber','Concluida':'badge-green',
+    'Urgente':'badge-red','Alta':'badge-amber','Normal':'badge-gray',
+    'Sospechoso':'badge-red','Imputado':'badge-purple','Testigo':'badge-blue','Víctima':'badge-amber'
+  };
+  return `<span class="badge ${m[e]||'badge-gray'}">${e}</span>`;
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  const btns = document.querySelectorAll('.nav-btn');
+  const map={dashboard:0,casos:1,investigaciones:2,personas:3,documentos:4,actividad:5};
+  if(map[id]!==undefined) btns[map[id]].classList.add('active');
+  if(id==='casos') renderCasos();
+  if(id==='investigaciones') renderInvestigaciones();
+  if(id==='personas') renderPersonas();
+  if(id==='documentos') renderDocumentos();
+  if(id==='actividad') renderLogs();
+  if(id==='dashboard') renderDashboard();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+async function guardarCaso() {
+  const caso = {
+    num: document.getElementById('c-num').value,
+    titulo: document.getElementById('c-titulo').value,
+    tipo: document.getElementById('c-tipo').value,
+    estado: document.getElementById('c-estado').value,
+    prioridad: document.getElementById('c-prioridad').value,
+    fiscal: document.getElementById('c-fiscal').value,
+    fecha: document.getElementById('c-fecha').value,
+    desc: document.getElementById('c-desc').value
+  };
+
+  await fetch('/caso', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(caso)
+  });
+
+  await cargarDB();
+  renderCasos();
+  renderDashboard();
+  closeModal('modal-caso');
+}
+  DB.casos.unshift(caso);
+  addLog(`Caso ${num} registrado: "${titulo}"`);
+  closeModal('modal-caso');
+  ['c-num','c-titulo','c-fiscal','c-fecha','c-desc'].forEach(id=>document.getElementById(id).value='');
+  renderDashboard();
+  renderCasos();
+function guardarInvestigacion() {
+  const nombre = document.getElementById('i-nombre').value.trim();
+  if(!nombre) { alert('El nombre es obligatorio'); return; }
+  const inv = {
+    id: uid(), nombre,
+    caso: document.getElementById('i-caso').value,
+    estado: document.getElementById('i-estado').value,
+    lider: document.getElementById('i-lider').value,
+    objetivo: document.getElementById('i-objetivo').value,
+    evidencias: document.getElementById('i-evidencias').value,
+    creado: now()
+  };
+  DB.investigaciones.unshift(inv);
+  addLog(`Investigación "${nombre}" iniciada`);
+  closeModal('modal-inv');
+  ['i-nombre','i-caso','i-lider','i-objetivo','i-evidencias'].forEach(id=>document.getElementById(id).value='');
+  renderInvestigaciones();
+}
+
+function guardarPersona() {
+  const nombre = document.getElementById('p-nombre').value.trim();
+  if(!nombre) { alert('El nombre es obligatorio'); return; }
+  const p = {
+    id: uid(), nombre,
+    idCiudadano: document.getElementById('p-id').value,
+    rol: document.getElementById('p-rol').value,
+    caso: document.getElementById('p-caso').value,
+    notas: document.getElementById('p-notas').value,
+    creado: now()
+  };
+  DB.personas.unshift(p);
+  addLog(`Persona registrada: ${nombre} (${p.rol})`);
+  closeModal('modal-persona');
+  ['p-nombre','p-id','p-caso','p-notas'].forEach(id=>document.getElementById(id).value='');
+  renderPersonas();
+}
+
+function guardarDocumento() {
+  const titulo = document.getElementById('d-titulo').value.trim();
+  if(!titulo) { alert('El título es obligatorio'); return; }
+  const doc = {
+    id: uid(), titulo,
+    tipo: document.getElementById('d-tipo').value,
+    caso: document.getElementById('d-caso').value,
+    contenido: document.getElementById('d-contenido').value,
+    emisor: document.getElementById('d-emisor').value,
+    creado: now()
+  };
+  DB.documentos.unshift(doc);
+  addLog(`Documento "${titulo}" (${doc.tipo}) creado`);
+  closeModal('modal-doc');
+  ['d-titulo','d-caso','d-contenido','d-emisor'].forEach(id=>document.getElementById(id).value='');
+  renderDocumentos();
+}
+
+function deleteCaso(id) {
+  const c = DB.casos.find(x=>x.id===id);
+  if(confirm('¿Eliminar este caso?')) {
+    DB.casos = DB.casos.filter(x=>x.id!==id);
+    addLog(`Caso ${c?.num||''} eliminado`);
+    renderCasos(); renderDashboard();
+  }
+}
+function deleteInv(id) { if(confirm('¿Eliminar?')){ DB.investigaciones=DB.investigaciones.filter(x=>x.id!==id); renderInvestigaciones(); }}
+function deletePersona(id) { if(confirm('¿Eliminar?')){ DB.personas=DB.personas.filter(x=>x.id!==id); renderPersonas(); }}
+function deleteDoc(id) { if(confirm('¿Eliminar?')){ DB.documentos=DB.documentos.filter(x=>x.id!==id); renderDocumentos(); }}
+
+function renderDashboard() {
+  document.getElementById('stat-total').textContent = DB.casos.length;
+  document.getElementById('stat-proceso').textContent = DB.casos.filter(c=>c.estado==='En proceso').length;
+  document.getElementById('stat-cerrados').textContent = DB.casos.filter(c=>c.estado==='Cerrado').length;
+  document.getElementById('stat-urgentes').textContent = DB.casos.filter(c=>c.prioridad==='Urgente').length;
+
+  const dc = document.getElementById('dashboard-casos');
+  if(DB.casos.length===0) { dc.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div>Sin casos registrados</div>'; }
+  else {
+    dc.innerHTML = DB.casos.slice(0,4).map(c=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:500;">${c.num} — ${c.titulo}</div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px;">${c.tipo} · ${c.fiscal||'Sin asignar'}</div>
+        </div>
+        ${estadoBadge(c.estado)} ${estadoBadge(c.prioridad)}
+      </div>`).join('');
+  }
+
+  const dl = document.getElementById('dashboard-logs');
+  if(DB.logs.length===0) { dl.innerHTML='<div style="font-size:13px;color:var(--color-text-secondary);">Sin actividad reciente</div>'; }
+  else {
+    dl.innerHTML = DB.logs.slice(0,5).map(l=>`
+      <div class="log-entry">
+        <div class="log-time">${l.time}</div>
+        <div class="log-text">${l.msg}</div>
+      </div>`).join('');
+  }
+}
+
+function renderCasos() {
+  const q = (document.getElementById('search-casos')?.value||'').toLowerCase();
+  const es = document.getElementById('filter-estado')?.value||'';
+  const tp = document.getElementById('filter-tipo')?.value||'';
+  const filtered = DB.casos.filter(c =>
+    (!q || c.titulo.toLowerCase().includes(q) || c.num.toLowerCase().includes(q) || (c.fiscal||'').toLowerCase().includes(q)) &&
+    (!es || c.estado===es) && (!tp || c.tipo===tp)
+  );
+  const el = document.getElementById('list-casos');
+  if(filtered.length===0) { el.innerHTML='<div class="empty-state"><div class="empty-icon">🗂</div>No se encontraron casos</div>'; return; }
+  el.innerHTML = filtered.map(c=>`
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${c.num} — ${c.titulo}</div>
+          <div class="card-sub">${c.tipo}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          ${estadoBadge(c.estado)} ${estadoBadge(c.prioridad)}
+          <button class="btn-danger" onclick="deleteCaso('${c.id}')">Eliminar</button>
+        </div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-key">Fiscal</div><div class="detail-val">${c.fiscal||'—'}</div></div>
+        <div class="detail-item"><div class="detail-key">Fecha apertura</div><div class="detail-val">${c.fecha||'—'}</div></div>
+      </div>
+      ${c.desc?`<div style="font-size:13px;color:var(--color-text-secondary);margin-top:8px;line-height:1.5;">${c.desc.slice(0,160)}${c.desc.length>160?'…':''}</div>`:''}
+      <div class="meta-row" style="margin-top:8px;"><span class="meta">Registrado: <span>${c.creado}</span></span></div>
+    </div>`).join('');
+}
+
+function renderInvestigaciones() {
+  const q = (document.getElementById('search-inv')?.value||'').toLowerCase();
+  const es = document.getElementById('filter-inv-estado')?.value||'';
+  const filtered = DB.investigaciones.filter(i =>
+    (!q || i.nombre.toLowerCase().includes(q) || (i.lider||'').toLowerCase().includes(q)) &&
+    (!es || i.estado===es)
+  );
+  const el = document.getElementById('list-investigaciones');
+  if(filtered.length===0) { el.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div>No hay investigaciones registradas</div>'; return; }
+  el.innerHTML = filtered.map(i=>`
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${i.nombre}</div>
+          <div class="card-sub">${i.lider?'Lider: '+i.lider:'Sin lider asignado'}${i.caso?' · Caso: '+i.caso:''}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          ${estadoBadge(i.estado)}
+          <button class="btn-danger" onclick="deleteInv('${i.id}')">Eliminar</button>
+        </div>
+      </div>
+      ${i.objetivo?`<div style="font-size:13px;color:var(--color-text-secondary);margin:8px 0;"><b style="color:var(--color-text-primary);font-weight:500;">Objetivo:</b> ${i.objetivo}</div>`:''}
+      ${i.evidencias?`<div style="margin-top:6px;">${i.evidencias.split(',').map(e=>`<span class="tag">${e.trim()}</span>`).join('')}</div>`:''}
+      <div class="meta-row" style="margin-top:8px;"><span class="meta">Creado: <span>${i.creado}</span></span></div>
+    </div>`).join('');
+}
+
+function renderPersonas() {
+  const q = (document.getElementById('search-personas')?.value||'').toLowerCase();
+  const rol = document.getElementById('filter-rol')?.value||'';
+  const filtered = DB.personas.filter(p =>
+    (!q || p.nombre.toLowerCase().includes(q) || (p.idCiudadano||'').toLowerCase().includes(q)) &&
+    (!rol || p.rol===rol)
+  );
+  const el = document.getElementById('list-personas');
+  if(filtered.length===0) { el.innerHTML='<div class="empty-state"><div class="empty-icon">👤</div>No hay personas registradas</div>'; return; }
+  el.innerHTML = filtered.map(p=>`
+    <div class="card">
+      <div class="card-header">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--color-background-info,#E6F1FB);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:#185FA5;flex-shrink:0;">${p.nombre.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase()}</div>
+          <div>
+            <div class="card-title">${p.nombre}</div>
+            <div class="card-sub">ID: ${p.idCiudadano||'—'}${p.caso?' · Caso: '+p.caso:''}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          ${estadoBadge(p.rol)}
+          <button class="btn-danger" onclick="deletePersona('${p.id}')">Eliminar</button>
+        </div>
+      </div>
+      ${p.notas?`<div style="font-size:13px;color:var(--color-text-secondary);margin-top:6px;">${p.notas}</div>`:''}
+      <div class="meta-row" style="margin-top:8px;"><span class="meta">Registrado: <span>${p.creado}</span></span></div>
+    </div>`).join('');
+}
+
+function renderDocumentos() {
+  const q = (document.getElementById('search-docs')?.value||'').toLowerCase();
+  const filtered = DB.documentos.filter(d =>
+    !q || d.titulo.toLowerCase().includes(q) || d.tipo.toLowerCase().includes(q) || (d.emisor||'').toLowerCase().includes(q)
+  );
+  const el = document.getElementById('list-documentos');
+  if(filtered.length===0) { el.innerHTML='<div class="empty-state"><div class="empty-icon">📄</div>No hay documentos registrados</div>'; return; }
+  el.innerHTML = filtered.map(d=>`
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${d.titulo}</div>
+          <div class="card-sub">${d.tipo}${d.emisor?' · '+d.emisor:''}${d.caso?' · Caso: '+d.caso:''}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span class="badge badge-blue">${d.tipo}</span>
+          <button class="btn-danger" onclick="deleteDoc('${d.id}')">Eliminar</button>
+        </div>
+      </div>
+      ${d.contenido?`<div style="font-size:13px;color:var(--color-text-secondary);margin-top:8px;border-left:2px solid var(--color-border-secondary);padding-left:10px;">${d.contenido.slice(0,200)}${d.contenido.length>200?'…':''}</div>`:''}
+      <div class="meta-row" style="margin-top:8px;"><span class="meta">Emitido: <span>${d.creado}</span></span></div>
+    </div>`).join('');
+}
+
+function renderLogs() {
+  const el = document.getElementById('full-logs');
+  if(DB.logs.length===0) { el.innerHTML='<div style="font-size:13px;color:var(--color-text-secondary);">Sin actividad registrada aún</div>'; return; }
+  el.innerHTML = DB.logs.map(l=>`
+    <div class="log-entry">
+      <div class="log-time">${l.time}</div>
+      <div class="log-text">${l.msg}</div>
+    </div>`).join('');
+}
+
+document.getElementById('hbadge-date').textContent = new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'});
+
+cargarDB().then(() => {
+  renderDashboard();
+});
+</script>
